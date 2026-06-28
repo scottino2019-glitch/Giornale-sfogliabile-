@@ -1,0 +1,6 @@
+{
+  "name": "Giornale Sfogliabile Realistico",
+  "description": "Un'applicazione interattiva per creare e sfogliare un giornale d'epoca, moderno o calligrafico orientale con testi e foto, impaginati con griglie tipografiche ed animazioni di sfoglio realistiche.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
