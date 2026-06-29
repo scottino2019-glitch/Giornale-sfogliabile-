@@ -1,10 +1,7 @@
 import { Newspaper, NewspaperPage } from "../types";
 
-export function exportInteractiveNewspaper(newspaper: Newspaper) {
-  const titleSlug = newspaper.name.toLowerCase().replace(/\s+/g, "-");
-  const fileName = `${titleSlug}-giornale-sfogliabile.html`;
-
-  const htmlContent = `<!DOCTYPE html>
+export function getInteractiveNewspaperHTML(newspaper: Newspaper): string {
+  return `<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8">
@@ -882,6 +879,12 @@ export function exportInteractiveNewspaper(newspaper: Newspaper) {
   </script>
 </body>
 </html>`;
+}
+
+export function exportInteractiveNewspaper(newspaper: Newspaper) {
+  const titleSlug = newspaper.name.toLowerCase().replace(/\s+/g, "-");
+  const fileName = `${titleSlug}-giornale-sfogliabile.html`;
+  const htmlContent = getInteractiveNewspaperHTML(newspaper);
 
   const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
   const url = URL.createObjectURL(blob);
