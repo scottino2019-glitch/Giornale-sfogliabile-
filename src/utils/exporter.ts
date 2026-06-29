@@ -527,7 +527,7 @@ export function getInteractiveNewspaperHTML(newspaper: Newspaper): string {
             <p class="text-[10px] font-serif italic text-current/80 mb-1 leading-snug">
               \${page.subtitle}
             </p>
-            <div class="flex-1 min-h-0 md:max-h-[140px] overflow-visible md:overflow-y-auto pr-1 page-scroll text-[10px] font-serif text-current/90 leading-relaxed text-justify space-y-2">
+            <div class="flex-1 min-h-0 md:max-h-[290px] overflow-visible md:overflow-y-auto pr-1 page-scroll text-[10px] font-serif text-current/90 leading-relaxed text-justify space-y-2">
               \${page.paragraphs.map(p => \`<p class="mb-1.5">\${p}</p>\`).join("")}
             </div>
           </div>
