@@ -107,10 +107,10 @@ export default function NewspaperPageRenderer({ page, paperTitle = "L'ECO DEL TE
           </div>
 
           {/* Right Column: Editorial Intro */}
-          <div className="md:col-span-5 flex flex-col justify-between overflow-visible">
-            <div>
+          <div className="md:col-span-5 flex flex-col justify-between overflow-visible min-h-0">
+            <div className="flex flex-col h-full min-h-0">
               <span className="text-[9px] font-mono uppercase text-red-700 font-bold block mb-0.5">
-                L\'Editoriale
+                L'Editoriale
               </span>
               <h2 className={`font-semibold leading-tight text-base md:text-lg mb-1 tracking-tight select-all
                 ${isOriental ? "font-oriental-serif" : isModern ? "font-sans font-extrabold" : "font-cinzel"}`}
@@ -120,8 +120,10 @@ export default function NewspaperPageRenderer({ page, paperTitle = "L'ECO DEL TE
               <p className="text-[10px] font-serif italic text-current/80 mb-1.5 leading-relaxed">
                 {subtitle}
               </p>
-              <div className="text-[10px] font-serif text-current/90 leading-relaxed text-justify line-clamp-5">
-                {paragraphs[0]}
+              <div className="text-[10px] font-serif text-current/90 leading-relaxed text-justify flex-1 min-h-0 md:max-h-[140px] overflow-visible md:overflow-y-auto pr-1 page-scroll space-y-2">
+                {paragraphs.map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
               </div>
             </div>
 
