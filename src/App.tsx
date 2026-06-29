@@ -4,7 +4,7 @@ import { defaultNewspaper } from "./defaultNewspaper";
 import NewspaperBook from "./components/NewspaperBook";
 import NewspaperEditor from "./components/NewspaperEditor";
 import NewspaperPageRenderer from "./components/NewspaperPageRenderer";
-import { exportInteractiveNewspaper } from "./utils/exporter";
+import { exportInteractiveNewspaper, getInteractiveNewspaperHTML } from "./utils/exporter";
 import { 
   BookOpen, 
   Feather, 
@@ -13,7 +13,12 @@ import {
   BookMarked,
   Layers,
   FileText,
-  Download
+  Download,
+  Code,
+  Copy,
+  Check,
+  ExternalLink,
+  Sparkles
 } from "lucide-react";
 
 const LOCAL_STORAGE_KEY = "realistic-newspaper-designer-data";
@@ -22,6 +27,24 @@ export default function App() {
   const [newspaper, setNewspaper] = useState<Newspaper>(() => JSON.parse(JSON.stringify(defaultNewspaper)));
   const [selectedPageId, setSelectedPageId] = useState<number>(1); // default to page 1 (cover)
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showEmbedModal, setShowEmbedModal] = useState(false);
+  const [copiedIframe, setCopiedIframe] = useState(false);
+  const [copiedHTML, setCopiedHTML] = useState(false);
+  const [viewMode, setViewMode] = useState<"book" | "focus">("focus");
+
+  const handleCopyIframe = () => {
+    const iframeCode = `<iframe \n  src="PERCORSO_DEL_TUO_GIORNALE/giornale-sfogliabile.html" \n  style="width: 100%; height: 720px; border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);"\n  title="${newspaper.name} - Giornale Sfogliabile"\n  allowfullscreen\n></iframe>`;
+    navigator.clipboard.writeText(iframeCode);
+    setCopiedIframe(true);
+    setTimeout(() => setCopiedIframe(false), 2000);
+  };
+
+  const handleCopyHTML = () => {
+    const htmlContent = getInteractiveNewspaperHTML(newspaper);
+    navigator.clipboard.writeText(htmlContent);
+    setCopiedHTML(true);
+    setTimeout(() => setCopiedHTML(false), 2000);
+  };
 
   // Load custom newspaper from localStorage on mount
   useEffect(() => {
@@ -122,6 +145,16 @@ export default function App() {
             <span>Esporta Sfogliabile (.html)</span>
           </button>
 
+          {/* Incorpora Iframe button */}
+          <button
+            onClick={() => setShowEmbedModal(true)}
+            className="px-4 py-1.5 border border-[#1A1A1A]/40 text-[10px] uppercase font-sans font-bold hover:bg-[#1A1A1A] hover:text-[#EBE7E0] hover:border-[#1A1A1A] transition-colors cursor-pointer flex items-center"
+            title="Ottieni il codice per inserire questo giornale in un iframe sul tuo sito"
+          >
+            <Code className="w-3.5 h-3.5 inline mr-1.5" />
+            <span>Inserisci nel tuo Sito (Iframe)</span>
+          </button>
+
           {/* Stampa / PDF button */}
           <button
             onClick={handlePrint}
@@ -137,27 +170,89 @@ export default function App() {
       {/* Main Workspace Workspace */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start relative z-10">
         
-        {/* LEFT COLUMN: The Physical realistic turning Newspaper */}
+        {/* LEFT COLUMN: The Physical realistic turning Newspaper or Zoom Focus View */}
         <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
-          <div className="bg-[#D9D5CD]/20 border border-[#1A1A1A]/20 p-4 rounded-xl shadow-lg backdrop-blur-xs">
+          <div className="bg-[#D9D5CD]/20 border border-[#1A1A1A]/20 p-4 rounded-xl shadow-lg backdrop-blur-xs flex flex-col">
             
-            {/* Quick Header information */}
-            <div className="flex justify-between items-center mb-3 px-2">
-              <div className="flex items-center gap-1 text-xs font-mono text-[#1A1A1A] font-bold">
-                <BookOpen className="w-4 h-4 text-[#1A1A1A]" />
-                <span>GIORNALE ATTIVO: <strong className="text-[#1A1A1A] uppercase font-bold">{newspaper.name}</strong></span>
+            {/* Quick Header information & View Mode Toggle */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 px-1 pb-3 border-b border-[#1A1A1A]/10">
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1.5 text-xs font-mono text-[#1A1A1A] font-bold">
+                  <BookOpen className="w-4 h-4 text-[#1A1A1A]" />
+                  <span>STAI MODIFICANDO: <strong className="text-red-700 uppercase font-bold">PAGINA {selectedPageId}</strong></span>
+                </div>
+                <span className="text-[10px] font-serif text-stone-600 mt-0.5">
+                  {newspaper.pages.find(p => p.id === selectedPageId)?.title || "Copertina Principale"}
+                </span>
               </div>
-              <div className="text-xxs font-mono text-[#1A1A1A] opacity-80 uppercase font-bold">
-                Edizione #{newspaper.editionNo} • {newspaper.date}
+
+              {/* Toggle controls */}
+              <div className="flex bg-[#D9D5CD]/60 p-1 border border-[#1A1A1A]/20 rounded-md shadow-xs self-stretch sm:self-auto justify-center">
+                <button
+                  onClick={() => setViewMode("focus")}
+                  className={`px-3 py-1 text-[10px] font-sans font-bold uppercase tracking-wider rounded transition-all cursor-pointer flex items-center gap-1.5 ${viewMode === "focus" ? "bg-[#1A1A1A] text-[#EBE7E0]" : "text-[#1A1A1A]/70 hover:text-[#1A1A1A]"}`}
+                  title="Mostra l'anteprima ingrandita ad alta definizione della singola pagina che stai modificando"
+                >
+                  <Sparkles className="w-3 h-3 text-amber-500" />
+                  <span>🔍 Zoom Leggibile</span>
+                </button>
+                <button
+                  onClick={() => setViewMode("book")}
+                  className={`px-3 py-1 text-[10px] font-sans font-bold uppercase tracking-wider rounded transition-all cursor-pointer flex items-center gap-1.5 ${viewMode === "book" ? "bg-[#1A1A1A] text-[#EBE7E0]" : "text-[#1A1A1A]/70 hover:text-[#1A1A1A]"}`}
+                  title="Mostra il giornale nel leggio 3D a doppia pagina"
+                >
+                  📖 Libro 3D Sfogliabile
+                </button>
               </div>
             </div>
 
-            {/* The Book Component */}
-            <NewspaperBook 
-              newspaper={newspaper}
-              onSelectPage={setSelectedPageId}
-              selectedPageId={selectedPageId}
-            />
+            {/* Render Preview Content based on viewMode */}
+            {viewMode === "focus" ? (
+              <div className="w-full flex flex-col items-center">
+                {/* Visual Canvas Paper Wrapper */}
+                <div className="w-full relative rounded-lg border-2 border-[#1A1A1A]/20 shadow-xl overflow-hidden bg-[#EBE7E0]">
+                  {/* Spine Header banner */}
+                  <div className="bg-[#1A1A1A] text-[#EBE7E0] px-4 py-2.5 flex justify-between items-center text-xxs font-mono uppercase tracking-widest border-b border-[#1A1A1A]/30">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-green-500 animate-ping" />
+                      <span className="font-bold">Anteprima Live ad Alta Leggibilità</span>
+                    </div>
+                    <span className="opacity-70">Ogni lettera è nitida al 100%</span>
+                  </div>
+
+                  {/* Outer container with warm vintage desktop feel but full width rendering */}
+                  <div className="p-4 sm:p-6 md:p-8 bg-stone-900/10 flex justify-center items-start overflow-y-auto max-h-[750px] page-scroll">
+                    <div className="w-full max-w-xl bg-[#EBE7E0] rounded-sm shadow-2xl border-4 border-[#1A1A1A] overflow-hidden flex flex-col relative" style={{ minHeight: "680px" }}>
+                      
+                      {/* Stylized corner metal corners for realistic vintage focus framing */}
+                      <div className="absolute top-1 left-1 w-3 h-3 border-t-2 border-l-2 border-[#1A1A1A]/20 pointer-events-none" />
+                      <div className="absolute top-1 right-1 w-3 h-3 border-t-2 border-r-2 border-[#1A1A1A]/20 pointer-events-none" />
+                      <div className="absolute bottom-1 left-1 w-3 h-3 border-b-2 border-l-2 border-[#1A1A1A]/20 pointer-events-none" />
+                      <div className="absolute bottom-1 right-1 w-3 h-3 border-b-2 border-r-2 border-[#1A1A1A]/20 pointer-events-none" />
+                      
+                      <div className="flex-1 flex flex-col p-1">
+                        <NewspaperPageRenderer 
+                          page={newspaper.pages.find(p => p.id === selectedPageId) || newspaper.pages[0]} 
+                          paperTitle={newspaper.name} 
+                          paperDate={newspaper.date} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-3 text-[10px] font-mono text-stone-600 text-center flex items-center gap-1.5 justify-center">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Consiglio: Modifica i testi a destra e guarda lo scorrere delle colonne a sinistra in tempo reale!</span>
+                </div>
+              </div>
+            ) : (
+              <NewspaperBook 
+                newspaper={newspaper}
+                onSelectPage={setSelectedPageId}
+                selectedPageId={selectedPageId}
+              />
+            )}
           </div>
 
           {/* Layout Quick Index Indicator */}
@@ -259,6 +354,120 @@ export default function App() {
                 className="px-4 py-2 bg-red-800 border border-red-950 text-[10px] uppercase font-sans font-bold text-red-50 hover:bg-red-900 transition-colors cursor-pointer"
               >
                 Ripristina
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Retro Calligraphic Embed & Iframe Modal */}
+      {showEmbedModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-[#EBE7E0] border-4 border-[#1A1A1A] p-6 max-w-2xl w-full shadow-2xl relative my-8 text-left">
+            {/* Corner decorations */}
+            <div className="absolute top-1 left-1 w-2.5 h-2.5 border-t-2 border-l-2 border-[#1A1A1A]" />
+            <div className="absolute top-1 right-1 w-2.5 h-2.5 border-t-2 border-r-2 border-[#1A1A1A]" />
+            <div className="absolute bottom-1 left-1 w-2.5 h-2.5 border-b-2 border-l-2 border-[#1A1A1A]" />
+            <div className="absolute bottom-1 right-1 w-2.5 h-2.5 border-b-2 border-r-2 border-[#1A1A1A]" />
+            
+            <h3 className="text-xl font-bold uppercase text-center tracking-wider border-b-2 border-[#1A1A1A] pb-2 mb-4" style={{ fontVariant: 'small-caps', fontFamily: 'Georgia, serif' }}>
+              Incorpora nel tuo Sito Web via Iframe
+            </h3>
+
+            <p className="text-xs font-serif leading-relaxed text-stone-800 mb-4">
+              Questo strumento genera un file <strong>HTML interattivo e autonomo</strong>. Puoi caricarlo sul tuo server web (es. tramite FTP, cPanel, WordPress Media, GitHub Pages, ecc.) e visualizzarlo in qualsiasi punto del tuo sito web tramite un semplice tag <code>&lt;iframe&gt;</code>.
+            </p>
+
+            {/* Step 1: Download or Copy HTML */}
+            <div className="mb-4 bg-[#D9D5CD]/40 p-3 rounded-lg border border-[#1A1A1A]/10">
+              <h4 className="text-xs font-sans font-bold uppercase tracking-wider text-[#1A1A1A] mb-1 flex items-center gap-1.5">
+                <span className="bg-[#1A1A1A] text-[#EBE7E0] w-4 h-4 rounded-full inline-flex items-center justify-center text-[10px] font-sans">1</span>
+                <span>Ottieni il file HTML del Giornale</span>
+              </h4>
+              <p className="text-[11px] font-serif text-stone-700 mb-3">
+                Scarica il file completo sul tuo computer, oppure copia l'intero codice sorgente per incollarlo in un file creato da te (es. chiamato <code>giornale.html</code>).
+              </p>
+              
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => exportInteractiveNewspaper(newspaper)}
+                  className="px-3 py-1.5 bg-amber-900 border border-amber-950 text-[10px] uppercase font-sans font-bold text-amber-50 hover:bg-[#1A1A1A] transition-colors cursor-pointer flex items-center shadow-xs"
+                >
+                  <Download className="w-3.5 h-3.5 mr-1" />
+                  Scarica file (.html)
+                </button>
+
+                <button
+                  onClick={handleCopyHTML}
+                  className="px-3 py-1.5 border border-[#1A1A1A] text-[10px] uppercase font-sans font-bold hover:bg-[#1A1A1A] hover:text-[#EBE7E0] transition-colors cursor-pointer flex items-center"
+                >
+                  {copiedHTML ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 mr-1 text-green-700" />
+                      Codice HTML Copiato!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 mr-1" />
+                      Copia intero Codice HTML
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Step 2: The Iframe Code */}
+            <div className="mb-4 bg-[#D9D5CD]/40 p-3 rounded-lg border border-[#1A1A1A]/10">
+              <h4 className="text-xs font-sans font-bold uppercase tracking-wider text-[#1A1A1A] mb-1 flex items-center gap-1.5">
+                <span className="bg-[#1A1A1A] text-[#EBE7E0] w-4 h-4 rounded-full inline-flex items-center justify-center text-[10px] font-sans">2</span>
+                <span>Usa questo codice Iframe nel tuo sito</span>
+              </h4>
+              <p className="text-[11px] font-serif text-stone-700 mb-2">
+                Incolla questo codice nel tuo sito (es. nel tuo editor WordPress in modalità HTML/Gutenberg, o nel codice sorgente del tuo sito). Ricordati di cambiare l'indirizzo <code>src</code> con il percorso in cui carichi il file.
+              </p>
+
+              <div className="relative">
+                <pre className="bg-[#1A1A1A] text-[#EBE7E0] p-2.5 rounded text-[10px] font-mono overflow-x-auto border border-stone-800 leading-relaxed max-h-36 page-scroll">
+{`<iframe 
+  src="PERCORSO_DEL_TUO_GIORNALE/giornale-sfogliabile.html" 
+  style="width: 100%; height: 720px; border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" 
+  title="${newspaper.name} - Giornale Sfogliabile"
+  allowfullscreen
+></iframe>`}
+                </pre>
+                <button
+                  onClick={handleCopyIframe}
+                  className="absolute top-2 right-2 p-1.5 bg-stone-800 hover:bg-stone-700 text-[#EBE7E0] rounded border border-stone-700 transition-colors cursor-pointer flex items-center justify-center"
+                  title="Copia codice Iframe"
+                >
+                  {copiedIframe ? (
+                    <Check className="w-3.5 h-3.5 text-green-400" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Step 3: How to update periodically */}
+            <div className="mb-5 bg-[#D9D5CD]/20 p-3 rounded-lg border border-dashed border-[#1A1A1A]/20">
+              <h4 className="text-xs font-sans font-bold uppercase tracking-wider text-[#1A1A1A] mb-1">
+                🔄 Come aggiornare il giornale periodicamente:
+              </h4>
+              <ul className="text-[11px] font-serif text-stone-700 list-disc list-inside space-y-1 pl-1">
+                <li>Ogni volta che vuoi aggiornare i contenuti, fai le modifiche qui nel designer.</li>
+                <li>Scarica il nuovo file HTML (o premi <em>"Copia intero Codice HTML"</em>).</li>
+                <li>Sovrascrivi il vecchio file (es. <code>giornale-sfogliabile.html</code>) sul tuo server.</li>
+                <li><strong>Fatto!</strong> Il tuo sito web mostrerà istantaneamente la nuova edizione aggiornata senza dover toccare il codice dell'iframe.</li>
+              </ul>
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowEmbedModal(false)}
+                className="px-5 py-2 border-2 border-[#1A1A1A] bg-[#1A1A1A] text-[#EBE7E0] text-[10px] uppercase font-sans font-bold hover:bg-transparent hover:text-[#1A1A1A] transition-colors cursor-pointer"
+              >
+                Chiudi Guida
               </button>
             </div>
           </div>
