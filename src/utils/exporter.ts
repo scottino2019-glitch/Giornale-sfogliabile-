@@ -401,7 +401,7 @@ export function getInteractiveNewspaperHTML(newspaper: Newspaper): string {
         // Wood grain filler for Left cover-spread
         const filler = document.createElement("div");
         filler.className = "hidden md:flex h-full items-center justify-center p-6 bg-gradient-to-r from-stone-950 to-stone-900 text-stone-500 font-mono text-xs uppercase tracking-widest";
-        filler.innerHTML = '<span>L\\\'Eco del Tempo</span>';
+        filler.innerHTML = "<span>L'Eco del Tempo</span>";
         spreadContainer.appendChild(filler);
       } else {
         const page = pages.find(p => p.id === leftPageId);
@@ -425,7 +425,7 @@ export function getInteractiveNewspaperHTML(newspaper: Newspaper): string {
       if (!page) {
         const filler = document.createElement("div");
         filler.className = "hidden md:flex h-full items-center justify-center p-6 bg-gradient-to-r from-stone-950 to-stone-900 text-stone-500 font-mono text-xs uppercase tracking-widest";
-        filler.innerHTML = '<span>L\\\'Eco del Tempo</span>';
+        filler.innerHTML = "<span>L'Eco del Tempo</span>";
         return filler;
       }
       const isOriental = page.style === "oriental";
@@ -474,16 +474,16 @@ export function getInteractiveNewspaperHTML(newspaper: Newspaper): string {
 
       if (page.type === "cover") {
         // COVER RENDERING STYLE
-        contentContainer.className = "flex-initial md:flex-1 md:min-h-0 my-3 flex flex-col justify-between overflow-visible z-10 py-1";
+        contentContainer.className = "flex-initial md:flex-1 md:min-h-0 my-1 flex flex-col justify-between overflow-visible z-10 py-0.5";
         
         // Masthead inside Cover
         const masthead = document.createElement("div");
-        masthead.className = "text-center py-2 md:py-3 border-b-2 border-current flex flex-col items-center";
+        masthead.className = "text-center py-1 md:py-1.5 border-b-2 border-current flex flex-col items-center";
         masthead.innerHTML = \`
-          <h2 class="uppercase leading-none tracking-tight font-cinzel-dec text-3xl md:text-5xl \${isOriental ? 'font-brush' : isModern ? 'font-sans font-black tracking-tighter' : ''}">
+          <h2 class="uppercase leading-none tracking-tight font-cinzel-dec text-2xl md:text-4xl \${isOriental ? 'font-brush' : isModern ? 'font-sans font-black tracking-tighter' : ''}">
             \${newspaper.name}
           </h2>
-          <p class="text-[9px] uppercase tracking-[0.2em] font-serif text-current/80 max-w-md text-center mt-1">
+          <p class="text-[9px] uppercase tracking-[0.2em] font-serif text-current/80 max-w-md text-center mt-0.5">
             \${newspaper.tagline || "Veritas, Libertas et Historia"}
           </p>
         \`;
@@ -491,7 +491,7 @@ export function getInteractiveNewspaperHTML(newspaper: Newspaper): string {
 
         // Meta Bar
         const metaBar = document.createElement("div");
-        metaBar.className = "flex justify-between items-center text-[9px] border-b border-current/30 py-1 font-mono uppercase text-current/80";
+        metaBar.className = "flex justify-between items-center text-[9px] border-b border-current/30 py-0.5 font-mono uppercase text-current/80";
         metaBar.innerHTML = \`
           <span>\${page.date || newspaper.date}</span>
           <span>Regno d'Italia</span>
@@ -501,13 +501,13 @@ export function getInteractiveNewspaperHTML(newspaper: Newspaper): string {
 
         // Cover Layout
         const coverGrid = document.createElement("div");
-        coverGrid.className = "grid grid-cols-1 md:grid-cols-12 gap-3 items-center flex-initial md:flex-1 md:min-h-0 my-2 overflow-visible";
+        coverGrid.className = "grid grid-cols-1 md:grid-cols-12 gap-3 items-center flex-initial md:flex-1 md:min-h-0 my-1 overflow-visible";
         
         const leftCol = document.createElement("div");
         leftCol.className = "md:col-span-7 flex flex-col justify-center";
         leftCol.innerHTML = \`
           <div class="p-1 border border-current/30 bg-white/40 shadow-xs">
-            <img src="\${page.imageUrl || 'https://picsum.photos/seed/cover/600/800'}" class="w-full h-[150px] md:h-[185px] object-cover filter grayscale sepia-[20%] contrast-[110%] brightness-[95%]">
+            <img src="\${page.imageUrl || 'https://picsum.photos/seed/cover/600/800'}" class="w-full h-[120px] md:h-[135px] object-cover filter grayscale sepia-[20%] contrast-[110%] brightness-[95%]">
           </div>
           <p class="text-[9px] italic mt-0.5 text-center text-current/70 font-serif">
             Illustrazione d'epoca: \${page.imageSearchKeyword || 'Incisione'}
@@ -521,14 +521,14 @@ export function getInteractiveNewspaperHTML(newspaper: Newspaper): string {
         rightCol.innerHTML = \`
           <div class="flex flex-col h-full min-h-0 w-full">
             <span class="text-[9px] font-mono uppercase text-red-700 font-bold block mb-0.5">L'Editoriale</span>
-            <h3 class="font-semibold leading-tight text-base md:text-lg mb-1 tracking-tight \${isOriental ? 'font-brush text-stone-900' : isModern ? 'font-sans font-black' : 'font-serif'}">
+            <h3 class="font-semibold leading-tight text-sm md:text-base mb-1 tracking-tight \${isOriental ? 'font-brush text-stone-900' : isModern ? 'font-sans font-black' : 'font-serif'}">
               \${page.title}
             </h3>
-            <p class="text-[10px] font-serif italic text-current/80 mb-1 leading-snug">
+            <p class="text-[9px] font-serif italic text-current/80 mb-0.5 leading-snug">
               \${page.subtitle}
             </p>
-            <div class="flex-1 min-h-0 md:max-h-[290px] overflow-visible md:overflow-y-auto pr-1 page-scroll text-[10px] font-serif text-current/90 leading-relaxed text-justify space-y-2">
-              \${page.paragraphs.map(p => \`<p class="mb-1.5">\${p}</p>\`).join("")}
+            <div class="flex-1 min-h-0 md:max-h-[175px] overflow-visible md:overflow-y-auto pr-1 page-scroll text-[9.5px] font-serif text-current/90 leading-normal text-justify space-y-1.5">
+              \${page.paragraphs.map(p => \`<p class="mb-1">\${p}</p>\`).join("")}
             </div>
           </div>
         \`;
