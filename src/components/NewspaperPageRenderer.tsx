@@ -64,31 +64,31 @@ export default function NewspaperPageRenderer({ page, paperTitle = "L'ECO DEL TE
         </div>
 
         {/* Newspaper Masthead */}
-        <div className="text-center py-2 md:py-4 border-b-2 border-current z-10 flex flex-col items-center">
+        <div className="text-center py-1 md:py-2.5 border-b-2 border-current z-10 flex flex-col items-center">
           <h1 className={`uppercase leading-none tracking-tight select-all
             ${isOriental 
-              ? "font-brush text-3xl sm:text-4xl md:text-6xl mb-1" 
+              ? "font-brush text-2xl sm:text-3xl md:text-5xl mb-1" 
               : isModern 
-              ? "font-sans font-black text-3xl sm:text-5xl md:text-7xl tracking-tighter" 
-              : "font-cinzel-dec text-3xl sm:text-4xl md:text-6xl mb-0.5"}`}
+              ? "font-sans font-black text-2xl sm:text-4xl md:text-6xl tracking-tighter" 
+              : "font-cinzel-dec text-2xl sm:text-3xl md:text-5xl mb-0.5"}`}
           >
             {paperTitle}
           </h1>
           
-          <p className="text-[10px] uppercase tracking-[0.25em] font-serif text-current/80 max-w-md text-center px-4 mt-1">
+          <p className="text-[9px] uppercase tracking-[0.25em] font-serif text-current/80 max-w-md text-center px-4 mt-0.5">
             “Veritas, Libertas et Historia”
           </p>
         </div>
 
         {/* Meta Bar */}
-        <div className="flex justify-between items-center text-xxs border-b border-current/30 py-1 font-mono uppercase z-10">
+        <div className="flex justify-between items-center text-xxs border-b border-current/30 py-0.5 font-mono uppercase z-10">
           <span>{date || "Anno I - N. 1"}</span>
-          <span>Regno d\'Italia</span>
+          <span>Regno d'Italia</span>
           <span>Prezzo: Cent. 15</span>
         </div>
 
         {/* Main Content Area */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 my-2 md:my-auto items-stretch z-10 py-2 overflow-visible flex-initial md:flex-1 md:min-h-0">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 my-1 md:my-auto items-stretch z-10 py-1 overflow-visible flex-initial md:flex-1 md:min-h-0">
           
           {/* Left Column: Cover Image */}
           <div className="md:col-span-7 flex flex-col justify-center">
@@ -97,7 +97,7 @@ export default function NewspaperPageRenderer({ page, paperTitle = "L'ECO DEL TE
               <img
                 src={imageUrl || "https://picsum.photos/seed/vintagecover/600/800"}
                 alt={title}
-                className="w-full h-[150px] md:h-[185px] object-cover filter grayscale sepia-[20%] contrast-[110%] brightness-[95%]"
+                className="w-full h-[120px] md:h-[135px] object-cover filter grayscale sepia-[20%] contrast-[110%] brightness-[95%]"
                 referrerPolicy="no-referrer"
               />
             </div>
@@ -112,15 +112,15 @@ export default function NewspaperPageRenderer({ page, paperTitle = "L'ECO DEL TE
               <span className="text-[9px] font-mono uppercase text-red-700 font-bold block mb-0.5">
                 L'Editoriale
               </span>
-              <h2 className={`font-semibold leading-tight text-base md:text-lg mb-1 tracking-tight select-all
+              <h2 className={`font-semibold leading-tight text-sm md:text-base mb-1 tracking-tight select-all
                 ${isOriental ? "font-oriental-serif" : isModern ? "font-sans font-extrabold" : "font-cinzel"}`}
               >
                 {title}
               </h2>
-              <p className="text-[10px] font-serif italic text-current/80 mb-1.5 leading-relaxed">
+              <p className="text-[9px] font-serif italic text-current/80 mb-0.5 leading-relaxed">
                 {subtitle}
               </p>
-              <div className="text-[10px] font-serif text-current/90 leading-relaxed text-justify flex-1 min-h-0 md:max-h-[290px] overflow-visible md:overflow-y-auto pr-1 page-scroll space-y-2">
+              <div className="text-[9.5px] font-serif text-current/90 leading-normal text-justify flex-1 min-h-0 md:max-h-[175px] overflow-visible md:overflow-y-auto pr-1 page-scroll space-y-1.5">
                 {paragraphs.map((p, i) => (
                   <p key={i}>{p}</p>
                 ))}
